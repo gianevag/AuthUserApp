@@ -1,46 +1,65 @@
-# Getting Started with Create React App
+# Add Auth Context - Typescript
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Yesterday, It was a free meeting day. I've created a react app with a Typescript template. The app handles the authorization user session by using React Context  and react-router library (v.6).
 
-## Available Scripts
+Firstly, I have created a [login page](https://www.figma.com/community/file/836569395944745131) inspired by the Figma mockups library; it is an excellent place to find mockups for user interfaces, and you can fork them into your account and export assets and CSS styling. 
 
-In the project directory, you can run:
+Secondly, I've created a context in react app about user authentication implements the Authorize user interface in context provider.
 
-### `npm start`
+```tsx
+interface AuthorizeUser {
+    isAuthorized: () => boolean;
+    logInUser: () => void;
+    logOutUser: () => void;
+    signInUser: () => void; 
+}
+```
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+I have created a navigation routing process using the react-router-dom library, and I've also added public routers and protected routers. I found some difficulties understanding the new version of react-router lib and where I can put the protected routers. The protected routes were added under a route component using as an element the ProtectRoutes component.
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+```tsx
+<BrowserRouter>
+      <Routes>
+        <Route path="/" element={<PublicPage/>} />
+        <Route path="/login" element={<LogIn />} />
+        <Route path="/publicpage" element={<PublicPage/>} />
+        <Route element={<ProtectRouters />}>
+          <Route path="/privatepage" element={<PrivatePage/>} />
+        </Route>
+      </Routes>
+  </BrowserRouter>
+```
 
-### `npm test`
+The ProtectRouters component use a context hook and check if a user is authenticated and if not then redirect to login page.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+```tsx
+ const ProtectRouters = () => {
+  const authUser = useContext(AuthorizationContext)
+ 
+  if(!authUser?.isAuthorized()) {
+      return <Navigate to="/login"/>
+  }
+	
+	// Used to render their child route elements
+  return (<><Outlet/></>)
+}
+```
 
-### `npm run build`
+On LogIn page was implemented the authorization context method signInUser and added in session storage the user token. 
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+```tsx
+import {AuthorizationContext} from "../../context";
+//...
+const authUser = useContext(AuthorizationContext)
+const navigate = useNavigate();
+//...
+const formHandler = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault()
+        // authenticate user by adding token to sessio storage
+				authUser?.signInUser()
+				// check if used is authorized and redirect to /privatepage
+        if(authUser?.isAuthorized()) {
+            navigate("/privatepage", {replace: true})
+        }
+    };
+```
