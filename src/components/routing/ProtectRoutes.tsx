@@ -1,6 +1,7 @@
 import React, { useContext } from "react"
 import { Navigate, Outlet } from "react-router"
 import { AuthorizationContext } from "../../context"
+import { Navigation } from "../Navigation"
 
 export const ProtectRouters = () => {
     const authUser = useContext(AuthorizationContext)
@@ -9,6 +10,6 @@ export const ProtectRouters = () => {
         return <Navigate to="/login"/>
     }
   
-    return (<><Outlet/></>)
+    return (<Navigation><Outlet/></Navigation>)
   }
   
