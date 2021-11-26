@@ -9,6 +9,7 @@ const authUser = new AuthUser()
 
 function App() {
   return (
+    // should to create a context provider component
     <AuthorizationContext.Provider value={authUser}>
       <HandleRouters />
     </AuthorizationContext.Provider>
